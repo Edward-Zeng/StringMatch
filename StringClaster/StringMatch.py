@@ -8,6 +8,7 @@ class StringMatch(StringMatcher.StringMatcher):
     Weight_i = {}
 
     def __init__(self,*args):
+        super().__init__(self)
         self._DisCara = True
         self._AdaptCara = True
         if len(args)!=0:
@@ -191,21 +192,38 @@ class StringMatch(StringMatcher.StringMatcher):
         alchar = []
         for i in range(128):
             alchar.append(chr(i))
+        para = [chr(i) for i in range(ord('a'),ord('z'))] + [chr(i) for i in range(ord('A'), ord('Z'))] + [chr(i) for i in range(ord('0'), ord('9'))]
         for i in alchar:
             cls.Weight_e[i] = {}
-            for j in alchar:
-                if i==j:
-                    cls.Weight_e[i][j] = 0
-                else:
-                    cls.Weight_e[i][j] = xe
-            cls.Weight_d[i] = xd
-            cls.Weight_i[i] = xi
+            if i not in para:
+                for j in alchar:
+                    if i==j:
+                        cls.Weight_e[i][j] = 0
+                    elif j in para:
+                        cls.Weight_e[i][j] = xe/5
+                    else:
+                        cls.Weight_e[i][j] = xe/10
+                cls.Weight_d[i] = xd/10
+                cls.Weight_i[i] = xi/10
+            else:
+                for j in alchar:
+                    if i==j:
+                        cls.Weight_e[i][j] = 0
+                    elif j in para:
+                        cls.Weight_e[i][j] = xe
+                    else:
+                        cls.Weight_e[i][j] = xe/5
+                cls.Weight_d[i] = xd
+                cls.Weight_i[i] = xi
+        del para
+        return cls
 
     @classmethod
     def AdaptAlterWeight(cls):
         alchar = []
         for i in range(128):
             alchar.append(chr(i))
+        return cls
 
     @classmethod
     def AlterWeight_e(cls,str1=' ',str2=' ',x=2):
@@ -217,6 +235,7 @@ class StringMatch(StringMatcher.StringMatcher):
                 raise 'The last input parameter should be a Number !'
         cls.Weight_e[str1][str2] = x
         cls.Weight_e[str2][str1] = x
+        return cls
 
     @classmethod
     def AlterWeight_i(cls,str,x):
@@ -227,6 +246,7 @@ class StringMatch(StringMatcher.StringMatcher):
             if type(x)!=type(1.1):
                 raise 'The last input parameter should be a Number !'
         cls.Weight_i[str] = x
+        return cls
 
     @classmethod
     def AlterWeight_d(cls,str,x):
@@ -237,6 +257,7 @@ class StringMatch(StringMatcher.StringMatcher):
             if type(x)!=type(1.1):
                 raise 'The last input parameter should be a Number !'
         cls.Weight_d[str] = x
+        return cls
 
 def main():
     Api = StringMatch()
@@ -252,8 +273,9 @@ def main():
         'wdfklisghoi',
     ]
     ll = Api.FuzzyMatch(lt1,lt2,2)
-    #print('Weight_E:%s;\n Weight_i:%s;\n Weight_d:%s'%(StringMatch.Weight_e,StringMatch.Weight_i,StringMatch.Weight_d))
+    print('Weight_E:%s;\n Weight_i:%s;\n Weight_d:%s'%(StringMatch.Weight_e,StringMatch.Weight_i,StringMatch.Weight_d))
     print(ll)
 
 if __name__ == '__main__':
     main()
+    pass
