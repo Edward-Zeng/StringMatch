@@ -1,10 +1,6 @@
 #coding=utf-8
 
-import numpy as np
-import pandas as pd
 from Levenshtein import StringMatcher
-from sklearn.cluster import KMeans
-from sklearn.datasets import make_blobs
 
 class StringMatch(StringMatcher.StringMatcher):
     Weight_e = {}
@@ -19,6 +15,7 @@ class StringMatch(StringMatcher.StringMatcher):
         else:
             StringMatch.InitWeight()
             self.ManualWeight()
+            self.UpdateWeight()
 
     def UpdateWeight(self,*args):
         if self._DisCara == True:
@@ -43,12 +40,16 @@ class StringMatch(StringMatcher.StringMatcher):
             for ax in [chr(it) for it in range(128)]:
                 for bx in [chr(ik) for ik in range(ord(ax),128)]:
                     for cx in [chr(il) for il in range(128)]:
-                        if self.GetWeight_e(ax,bx) >= self.GetWeight_e(ax,cx) + self.GetWeight_e(bx,cx):
+                        if self.GetWeight_e(ax,bx) > self.GetWeight_e(ax,cx) + self.GetWeight_e(bx,cx):
                             para = 1
                             self.AlterWeight(ax,bx,(self.GetWeight_e(ax,cx) + self.GetWeight_e(bx,cx)))
                             continue
-                        elif self.GetWeight_e(ax,bx) >= self.GetWeight_d(ax) + self.GetWeight_i(bx) or self.GetWeight_e(ax,bx) >= self.GetWeight_d(ax) + self.GetWeight_i(bx):
-
+                        elif self.GetWeight_e(ax,bx) > self.GetWeight_d(ax) + self.GetWeight_i(bx) or self.GetWeight_e(ax,bx) > self.GetWeight_d(ax) + self.GetWeight_i(bx):
+                            para = 1
+                            self.AlterWeight(ax,bx,(self.GetWeight_d(ax) + self.GetWeight_i(bx)))
+                            continue
+                        else:
+                            continue
 
     def AlterWeight(self,*args):
         target = ''
@@ -148,6 +149,22 @@ class StringMatch(StringMatcher.StringMatcher):
         except Exception:
             return super.distance(str1,str2)
 
+    def FuzzyMatch(self,strtemp,temp,ini=1):
+        if not ((isinstance(temp,list) or isinstance(temp,tuple)) and isinstance(strtemp, str)):
+            raise 'input error'
+        else:
+            aslist = {}
+            for astemp in temp:
+                aslist[astemp] = self.distance(strtemp,astemp)
+            bslist = sorted(aslist.items(), key = lambda x:x[1],reverse = False)
+            cslist = {}
+            for i in range(ini):
+                cslist[bslist[i][0]] = bslist[i][1]
+        del aslist
+        del bslist
+        return cslist
+
+
     @classmethod
     def InitWeight(cls,*args):
         ln_temp = args
@@ -223,8 +240,18 @@ class StringMatch(StringMatcher.StringMatcher):
 
 def main():
     Api = StringMatch()
-    Api.AlterWeight('s','k',100)
-    ll = Api.distence('as0l','asdI')
+   # Api.UpdateWeight()
+    lt1 = 'wdfolisghoi'
+    lt2 = [
+        'ajgoirw',
+        'jiejfgoih',
+        'ncidnjih',
+        'wdfoIisghoi',
+        'wdfolisghoi',
+        'adfolisghoi',
+        'wdfklisghoi',
+    ]
+    ll = Api.FuzzyMatch(lt1,lt2,2)
     #print('Weight_E:%s;\n Weight_i:%s;\n Weight_d:%s'%(StringMatch.Weight_e,StringMatch.Weight_i,StringMatch.Weight_d))
     print(ll)
 
