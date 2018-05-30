@@ -7,10 +7,11 @@ class StringMatch(StringMatcher.StringMatcher):
     Weight_d = {}
     Weight_i = {}
 
-    def __init__(self,*args):
+    def __init__(self,_DisCara = False, _AdaptCara = True, _AdaptCara_Space = 0, *args):
         super().__init__(self)
-        self._DisCara = True
-        self._AdaptCara = True
+        self._DisCara = _DisCara
+        self._AdaptCara = _AdaptCara
+        self._AdaptCara_Space = _AdaptCara_Space
         if len(args)!=0:
             StringMatch.InitWeight(*args)
         else:
@@ -35,7 +36,7 @@ class StringMatch(StringMatcher.StringMatcher):
             else:
                 if len(args)!=0:
                     StringMatch.InitWeight(args)
-        para = 1
+        para = self._AdaptCara_Space
         while para!=0:
             para = 0
             for ax in [chr(it) for it in range(128)]:
@@ -109,19 +110,46 @@ class StringMatch(StringMatcher.StringMatcher):
             self._DisCara = False
             self.UpdateWeight()
 
+    def ConfirmSpace(self):
+        if self._AdaptCara_Space == 1:
+            print('Original Weight Matrix is already confermed for a Matric Space.')
+        else:
+            self._AdaptCara_Space = 1
+            self.UpdateWeight()
+
+    def DisConfirmSpace(self):
+        if self._AdaptCara_Space == 0:
+            print('Original Weight Matrix is not confermed for a Metric Space.')
+        else:
+            self._AdaptCara_Space = 0
+            etemp = max(max(StringMatch.Weight_e))
+            itemp = max(StringMatch.Weight_i)
+            dtemp = max(StringMatch.Weight_d)
+            StringMatch.InitWeight(dtemp,itemp,etemp)
+            self.UpdateWeight()
+
     def ManualWeight(self):
-        StringMatch.AlterWeight_e('o', '0', 0.4)
-        StringMatch.AlterWeight_e('B', '8', 0.4)
-        StringMatch.AlterWeight_e('O', '0', 0.4)
-        StringMatch.AlterWeight_e('q', '9', 0.8)
-        StringMatch.AlterWeight_e('b', '6', 0.8)
-        StringMatch.AlterWeight_e('4', '9', 1.6)
-        StringMatch.AlterWeight_e('I', '1', 0.4)
-        StringMatch.AlterWeight_e('I', 'l', 0.4)
-        StringMatch.AlterWeight_e('1', 'l', 0.4)
-        StringMatch.AlterWeight_e('7', 'T', 0.4)
-        StringMatch.AlterWeight_e('Q', 'O', 0.8)
-        StringMatch.AlterWeight_e('2', 'z', 0.8)
+        '''
+        Manually alter the Weight Matrix by a list of confirmed principles.
+        '''
+        StringMatch.AlterWeight_e('o', '0', 0.2)
+        StringMatch.AlterWeight_e('B', '8', 0.2)
+        StringMatch.AlterWeight_e('O', '0', 0.2)
+        StringMatch.AlterWeight_e('q', '9', 0.4)
+        StringMatch.AlterWeight_e('b', '6', 0.4)
+        StringMatch.AlterWeight_e('4', '9', 1.0)
+        StringMatch.AlterWeight_e('I', '1', 0.2)
+        StringMatch.AlterWeight_e('I', 'l', 0.2)
+        StringMatch.AlterWeight_e('1', 'l', 0.2)
+        StringMatch.AlterWeight_e('1', 'L', 0.8)
+        StringMatch.AlterWeight_e('7', 'T', 1.0)
+        StringMatch.AlterWeight_e('Q', 'O', 0.2)
+        StringMatch.AlterWeight_e('2', 'z', 0.2)
+        StringMatch.AlterWeight_e('2', 'Z', 0.2)
+        StringMatch.AlterWeight_e('E', 'B', 0.8)
+        StringMatch.AlterWeight_e('8', 'E', 0.8)
+        StringMatch.AlterWeight_e('D', 'O', 0.4)
+        StringMatch.AlterWeight_e('C', 'O', 0.4)
 
     def distance(self,str1,str2):
         if not (isinstance(str1,str) and isinstance(str2,str)):
